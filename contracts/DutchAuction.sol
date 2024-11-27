@@ -24,4 +24,34 @@ contract DutchAuction {
     endsAt = block.timestamp + DURATION;
     item = _item;
   }
+
+  modifier notStopped {
+    require(!stopped, "has already stopped!");
+    _;
+  }
+
+  function getPrice() public view notStopped returns(uint) {
+    uint timeElapsed = block.timestamp - startAt;
+    uint discount = discountRate * timeElapsed;
+    return startingPrice - discount;
+  }
+
+  function nextBlock() external {
+
+  }
+
+  function buy() external payable notStopped {
+    require(block.timestamp < endsAt, "too late!");
+    uint price = getPrice();
+    require(msg.value >= price, "too low!");
+    uint refund = msg.value - price;
+
+    if (refund > 0) {
+      payable(msg.sender).transfer(refund);
+    }
+
+    seller.transfer(address(this).balance);
+    stopped = true;
+    emit Bought(price, msg.sender);
+  }
 }
