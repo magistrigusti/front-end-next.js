@@ -88,6 +88,13 @@ export default class extends Component {
          currentPrice: ethers.utils.formatEther(newPrice);
       })
     }, 1000);
+
+    const startBlockNumber = await this._provider.getBlockNumber();
+    this._auction.on('Bought', (...args) => {
+      const event = args[args.length - 1];
+      if (event.blockNumber <= startBlockNumber) return
+      args[0], args[1]
+    })
   };
 
   updateStopped = async() => {

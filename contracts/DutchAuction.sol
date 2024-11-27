@@ -11,6 +11,8 @@ contract DutchAuction {
   string public item;
   bool public stopped;
 
+  event Bought(uint price, address buyer);
+
   constructor(
     uint _startingPrice, 
     uint _discountRate, 
